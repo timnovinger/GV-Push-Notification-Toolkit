@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>Prowl</string>
+	<key>CFBundleIdentifier</key>
+	<string>net.weks.prowl.growlplugin</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Prowl</string>
+	<key>CFBundlePackageType</key>
+	<string>GEXT</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>GrowlPluginAuthor</key>
+	<string>Zachary West</string>
+	<key>GrowlPluginDescription</key>
+	<string>Prowl Growl Plugin, to send messages to the server.</string>
+	<key>NSPrincipalClass</key>
+	<string>ProwlGrowlPlugin</string>
+</dict>
+</plist>
