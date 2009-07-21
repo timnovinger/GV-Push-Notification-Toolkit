@@ -4,7 +4,8 @@
 // @description Display a dock badge for Google Voice when using Fluid.
 // @include     https://www.google.com/voice*
 // @include     http://www.google.com/voice*
-// @author		Ajax SMS Feature by Tim Novinger (tim.novinger AT gmail DOT com) http://www.timnovinger.com
+// @author		Ajax SMS Feature by Tim Novinger (tim.novinger AT gmail DOT com) http://www.timnovinger.com or http://github.com/timnovinger
+//				with help from Mike Krisher — http://github.com/mkrisher
 // ==/UserScript==
 
 if (!window.fluid) {
