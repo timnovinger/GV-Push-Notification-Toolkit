@@ -15,13 +15,69 @@ if (!window.fluid) {
 var currentCount = 0;
 var currentVMCount = 0;
 var currentSMSCount = 0;
+var currentAjaxSMSCount = 0;
 var currentRecCount = 0;
 var doAlerts = false;
 
-// Call the badge update function
-doBadgeUpdates(5000);
+var xmlhttp;
+var url = 'https://www.google.com/voice/inbox/recent/';
 
-function doBadgeUpdates(timeout) {
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//! CALL MAIN FUNCTION
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+doBadgeUpdates(5000);
+var runAjax = setInterval(Ajax, 5000);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//!  AJAX
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+function Ajax()
+{
+	xmlhttp = null;
+	xmlhttp = new XMLHttpRequest();
+
+	if (xmlhttp != null) {
+		xmlhttp.onreadystatechange = state_Change;
+		xmlhttp.open("GET",url,true);
+		xmlhttp.send(null);
+	} else {
+		alert("Your browser does not support XMLHTTP.");
+	}
+}
+
+	
+function state_Change()
+{
+	if (xmlhttp.readyState == 4) { 								// 4 = "loaded"
+		if (xmlhttp.status == 200) {							// 200 = OK
+			
+			//save ajax response
+			var json = xmlhttp.responseText;
+			
+			//parse response string as XML
+			var xmlobject = (new DOMParser()).parseFromString(json, "text/xml");
+			
+			//look for only JSON data within XML
+			var messages = xmlobject.getElementsByTagName('json')[0];
+			
+			//eval it and turn it into a JSON object
+			var msgObj = eval( '(' + messages.firstChild.nodeValue + ')' );
+			
+			//parse JSON object for SMS notification
+			currentAjaxSMSCount = getByAjaxSMS(msgObj);
+			//console.log(currentAjaxSMSCount);
+		} else {
+			alert("Problem retrieving XML data");
+		}
+	}
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//!  BADGE UPDATES
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+function doBadgeUpdates(timeout) 
+{
 	// Total number of items (Voicemail+SMS+Recorded)
 	// Remember to typecast these as numbers
 	currentCount = Number(getNotificationTotal());
@@ -39,7 +95,7 @@ function doBadgeUpdates(timeout) {
 	if(currentCount&&currentCount!=0) {
 		window.fluid.dockBadge = currentCount;
 		if(!doAlerts){
-			doGrowlAlert('base',currentCount);
+			//doGrowlAlert('base',currentCount);
 		}
 	}else{
 		window.fluid.dockBadge = "";
@@ -49,7 +105,11 @@ function doBadgeUpdates(timeout) {
 	setTimeout(doBadgeUpdates, timeout);
 }
 
-function doGrowlAlert(type,count) {
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//!  GROWL ALERT
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+function doGrowlAlert(type,count) 
+{
 	var title;
 	var msg;
 
@@ -90,7 +150,12 @@ function doGrowlAlert(type,count) {
 	}
 }
 
-function getVoicemailTotal(){
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//!  GET VOICEMAIL
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+function getVoicemailTotal()
+{
 	var sidebar = document.getElementById(':b').innerHTML;
 	// Split it so that we only have the number parts just to make sure theres no other number here
 	var number = sidebar.split('>Voicemail')[1];
@@ -104,6 +169,9 @@ function getVoicemailTotal(){
 	return count;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//!  GET SMS
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
 function getSMSTotal(){
 	var sidebar = document.getElementById(':c').innerHTML;
 	// Split it so that we only have the number parts just to make sure theres no other number here
@@ -118,6 +186,41 @@ function getSMSTotal(){
 	return count;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//!  GET SMS via AJAX
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+function getByAjaxSMS(msgObj){
+	//get unread SMS count
+	var count = Number(msgObj['unreadCounts']['sms']);
+	
+	//determine message gramar
+	if(count == 1){
+		var postfix = '';
+	} else {
+		var postfix = 's';
+	}
+   	
+   	//format message
+   	var msg = count+' new SMS message'+postfix;
+
+	//only push out if we've received a NEW message
+	if(count>currentAjaxSMSCount)
+	{	
+		//send to Prowl
+		fluid.showGrowlNotification({
+			title: "Google Voice",
+			description: msg,
+			priority: 3,
+				sticky: false
+		});
+	}
+	//console.log(count +" " + currentAjaxSMSCount);
+	return count;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//!  GET INBOX COUNT
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
 function getNotificationTotal() {
 	// Get the HTML from the Inbox element on the sidebar
 	var sidebar = document.getElementById(':5').innerHTML;
