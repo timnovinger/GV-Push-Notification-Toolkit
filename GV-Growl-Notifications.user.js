@@ -4,7 +4,7 @@
 // @description Display a dock badge for Google Voice when using Fluid.
 // @include     https://www.google.com/voice*
 // @include     http://www.google.com/voice*
-// @author      Someone
+// @author      Felipe Oduardo and Tim Novinger
 // ==/UserScript==
 
 (function () {
