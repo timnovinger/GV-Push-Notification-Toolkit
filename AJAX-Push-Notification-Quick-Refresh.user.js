@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        AJAX Push Notification Quick Refresh
+// @name        AJAX Push Notification Quick Refresh 1.0
 // @namespace   http://fluidapp.com
 // @description Uses XHR requests on a timer to speed up the refresh rate of the GV SMS Inbox for pushing out to Prowl for enhanced iPhone OS Push Notifications
 // @include     https://www.google.com/voice*
