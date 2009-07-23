@@ -14,6 +14,7 @@
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// !VARIABLES
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
+		var debug = false;
 		var xmlhttp, json, xml;
 		var count = 0;
 		var actualCount = 0;
@@ -63,7 +64,7 @@
 					push(json);
 					
 					//!debug
-					//console.log(actualCount);
+					if(debug){ console.log(actualCount); }
 				} else {
 					alert("Problem retrieving XML data");
 				}
@@ -117,7 +118,7 @@
 			count = actualCount;
 			
 			//!debug
-			//console.log(actualCount +" " + count);
+			if(debug){ console.log(actualCount +" " + count); }
 		}
     }
 })();
