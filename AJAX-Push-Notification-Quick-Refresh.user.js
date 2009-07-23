@@ -14,7 +14,10 @@
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// !VARIABLES
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
+<<<<<<< .merge_file_pCRDTW
 		var debug = false;
+=======
+>>>>>>> .merge_file_3BCX46
 		var xmlhttp, json, xml;
 		var count = 0;
 		var actualCount = 0;
@@ -64,7 +67,11 @@
 					push(json);
 					
 					//!debug
+<<<<<<< .merge_file_pCRDTW
 					if(debug){ console.log(actualCount); }
+=======
+					//console.log(actualCount);
+>>>>>>> .merge_file_3BCX46
 				} else {
 					alert("Problem retrieving XML data");
 				}
@@ -118,7 +125,11 @@
 			count = actualCount;
 			
 			//!debug
+<<<<<<< .merge_file_pCRDTW
 			if(debug){ console.log(actualCount +" " + count); }
+=======
+			//console.log(actualCount +" " + count);
+>>>>>>> .merge_file_3BCX46
 		}
     }
 })();
