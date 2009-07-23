@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name        AJAX Push Notification Quick Refresh
+// @name        AJAX Push Notification Quick Refresh v2.0
 // @namespace   http://fluidapp.com
-// @description Uses XHR requests on a timer to speed up the refresh rate of the GV SMS Inbox for pushing out to Prowl for enhanced iPhone OS Push Notifications
+// @description Uses XHR requests to increase refresh rate of GV's SMS Inbox when used to push notifications to Prowl
 // @include     https://www.google.com/voice*
 // @include     http://www.google.com/voice*
-// @author      Tim Novinger {http://www.github.com/timnovinger} and Mike Krisher {http://www.github.com/mkrisher}
+// @author      Tim Novinger {http://www.github.com/timnovinger}, Mike Krisher {http://www.github.com/mkrisher}
 // ==/UserScript==
 
 (function () {
@@ -12,29 +12,31 @@
     {
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Setup variables
+		// !VARIABLES
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-		var xmlhttp;
-		var currentCount = 0;
+		var xmlhttp, json, xml;
+		var count = 0;
+		var actualCount = 0;
+		var msg = '';
 		var url = 'https://www.google.com/voice/inbox/recent/';
 		
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//! INITIALIZE
+		// !INITIALIZE
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-		var init = setInterval(Ajax, 5000);
+		var init = setInterval(get, 5000);
 		
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//!  AJAX REQUEST
+		//  AJAX REQUEST
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-		function Ajax()
+		function get()
 		{
 			xmlhttp = null;
 			xmlhttp = new XMLHttpRequest();
 		
 			if (xmlhttp != null) {
-				xmlhttp.onreadystatechange = state_Change;
+				xmlhttp.onreadystatechange = eventHandler;
 				xmlhttp.open("GET",url,true);
 				xmlhttp.send(null);
 			} else {
@@ -44,29 +46,24 @@
 		
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//!  STATE CHANGE HANDLER
+		// PARSE XML FEED FOR JSON
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////	
-		function state_Change()
+		function eventHandler()
 		{
-			if (xmlhttp.readyState == 4) { 								// 4 = "loaded"
-				if (xmlhttp.status == 200) {							// 200 = OK
+			if (xmlhttp.readyState == 4) { 					// 4 = "loaded"
+				if (xmlhttp.status == 200) {				// 200 = "OK"
 					
 					//save ajax response
-					var json = xmlhttp.responseText;
+					xml = xmlhttp.responseText;
 					
-					//parse response string as XML
-					var xmlobject = (new DOMParser()).parseFromString(json, "text/xml");
+					//parse json object
+					json = parse(xml);
 					
-					//look for only JSON data within XML
-					var messages = xmlobject.getElementsByTagName('json')[0];
+					//push SMS notification
+					push(json);
 					
-					//eval it and turn it into a JSON object
-					var msgObj = eval( '(' + messages.firstChild.nodeValue + ')' );
-					
-					//parse JSON object for SMS notification
-					currentCount = getByAjaxSMS(msgObj);
-					
-					//console.log(currentCount);
+					//!debug
+					//console.log(actualCount);
 				} else {
 					alert("Problem retrieving XML data");
 				}
@@ -75,36 +72,52 @@
 		
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//!  GET SMS via AJAX
+		// PARSE JSON OBJECT
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-		function getByAjaxSMS(msgObj){
+		function parse(xml)
+		{
+			//parse response string as XML
+			var xmlobject = (new DOMParser()).parseFromString(xml, "text/xml");
+			
+			//look for only JSON data within XML
+			var obj = xmlobject.getElementsByTagName('json')[0];
+			
+			//eval it and turn it into a JSON object
+			return eval( '(' + obj.firstChild.nodeValue + ')' );
+		}
+		
+		
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// PUSH NOTIFICATION OUT
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////
+		function push(json)
+		{
 			//get unread SMS count
-			var count = Number(msgObj['unreadCounts']['sms']);
+			actualCount = Number(json['unreadCounts']['sms']);
 			
 			//determine message gramar
-			if(count == 1){
-				var postfix = '';
-			} else {
-				var postfix = 's';
-			}
+			var postfix = (count == 1) ? '' : 's';
 		   	
 		   	//format message
-		   	var msg = count+' new SMS message'+postfix;
+		   	msg = actualCount + ' new SMS message' + postfix;
 		
 			//only push out if we've received a NEW message
-			if(count>currentCount)
+			if(actualCount > count)
 			{	
 				//send to Prowl
 				fluid.showGrowlNotification({
 					title: "Google Voice",
 					description: msg,
 					priority: 3,
-						sticky: false
+					sticky: false
 				});
 			}
-			//console.log(count +" " + currentCount);
-			return count;
+			
+			//update counter
+			count = actualCount;
+			
+			//!debug
+			//console.log(actualCount +" " + count);
 		}
-		
     }
 })();
