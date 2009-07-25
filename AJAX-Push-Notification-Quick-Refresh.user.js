@@ -66,7 +66,7 @@
 					//!debug
 					if(debug){ console.log(actualCount); }
 				} else {
-					alert("There was an error establishing a connection with Google Voice.");
+					console.log("There was an error establishing a connection with Google Voice.");
 				}
 			}
 		}
