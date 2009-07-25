@@ -15,11 +15,11 @@
 		// !VARIABLES
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
 		var debug = false;
-		var xmlhttp, json, xml;
+		var xmlhttp, json, xml, msg;
 		var count = 0;
 		var actualCount = 0;
-		var msg = '';
 		var url = 'https://www.google.com/voice/inbox/recent/';
+		var inbox = document.getElementById('gc-view-main');
 		
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +66,7 @@
 					//!debug
 					if(debug){ console.log(actualCount); }
 				} else {
-					alert("Problem retrieving XML data");
+					alert("There was an error establishing a connection with Google Voice.");
 				}
 			}
 		}
